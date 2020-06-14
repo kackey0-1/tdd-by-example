@@ -17,10 +17,6 @@ public class Money implements Expression {
         return this.currency;
     };
 
-    public Money times(int multiplier) {
-        return new Money(amount*multiplier, this.currency);
-    };
-
     public static Money dollar(int amount) {
         return new Money(amount, "USD");
     }
@@ -36,8 +32,8 @@ public class Money implements Expression {
     }
 
     @Override
-    public Money reduce(String to) {
-        return this;
+    public Money reduce(Bank bank, String to) {
+        return new Money(amount / bank.rate(this.currency, to), to);
     }
 
     @Override
@@ -48,7 +44,13 @@ public class Money implements Expression {
                 '}';
     }
 
-    public Expression plus(Money addend) {
+    @Override
+    public Expression times(int multiplier) {
+        return new Money(amount*multiplier, this.currency);
+    };
+
+    @Override
+    public Expression plus(Expression addend) {
         return new Sum(this, addend);
     }
 }
